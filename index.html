@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TensorFlow/Keras et PyTorch : comparaison des frameworks</title>
+<style>
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; background:#fff; color:#000; overflow:hidden;
+    font-family:"Georgia","Times New Roman",serif; }
+  #stage { position:absolute; left:50%; top:50%; width:1280px; height:720px;
+    transform-origin:center center; background:#fff; border:1px solid #000; }
+  .slide { display:none; position:absolute; inset:0; padding:44px 68px 56px; font-size:23px; line-height:1.5; }
+  .slide.on { display:block; }
+  h1 { font-size:46px; line-height:1.2; margin:0 0 18px; }
+  h2 { font-size:34px; margin:0 0 22px; padding-bottom:10px; border-bottom:2px solid #000; line-height:1.2; }
+  h3 { font-size:23px; font-style:italic; margin:14px 0 4px; }
+  p { margin:0 0 12px; }
+  ul,ol { margin:0 0 8px; padding-left:28px; }
+  li { margin-bottom:8px; }
+  .cols { display:grid; grid-template-columns:1fr 1fr; gap:36px; }
+  .cols > div { min-width:0; }
+  table { width:100%; border-collapse:collapse; font-size:19px; line-height:1.35; margin-top:6px; }
+  thead th { border-top:2px solid #000; border-bottom:1px solid #000; text-align:left; padding:7px 10px; }
+  tbody td { padding:7px 10px; border-bottom:1px solid #bbb; vertical-align:top; }
+  tbody tr:last-child td { border-bottom:2px solid #000; }
+  pre { margin:6px 0 4px; padding:12px 16px; background:#f3f3f3; border-left:4px solid #000;
+    font-size:15.5px; line-height:1.45; overflow:hidden; }
+  code { font-family:Menlo,Consolas,"Courier New",monospace; font-size:.85em; }
+  .cap { font-size:16px; color:#444; margin:2px 0 0; }
+  .box { border:1px solid #000; padding:12px 20px; margin-top:16px; font-size:21px; }
+  .title { text-align:center; padding-top:150px; }
+  .title p { font-size:25px; margin-bottom:6px; }
+  .title .small { font-size:20px; color:#444; margin-top:34px; }
+  .title hr { border:0; border-top:2px solid #000; width:260px; margin:26px auto; }
+  .foot { position:absolute; left:68px; right:68px; bottom:16px; display:flex; justify-content:space-between;
+    font-size:15px; color:#444; border-top:1px solid #000; padding-top:6px; }
+  #bar { position:fixed; left:0; top:0; height:4px; background:#000; width:0; transition:width .2s; z-index:5; }
+  #nav { position:fixed; right:14px; bottom:12px; display:flex; gap:8px; z-index:5; }
+  #nav button { font:16px Georgia,serif; background:#fff; color:#000; border:1px solid #000; padding:4px 14px; cursor:pointer; }
+  #nav button:hover { background:#000; color:#fff; }
+  #nav button:focus-visible { outline:2px solid #000; outline-offset:2px; }
+  /* ---- Couleurs ---- */
+  h2 { border-bottom:3px solid #0b5cad; }
+  h3 { color:#1f2d3d; }
+  b, strong { color:#0b5cad; }
+  em { color:#1b7f5c; }
+  code { color:#b3125a; background:#fdecf3; padding:1px 5px; border-radius:3px; }
+  pre { background:#f6f8fa; border-left:4px solid #0b5cad; }
+  pre code { background:none; padding:0; color:#1f2d3d; }
+  .box { background:#eef5fd; border:1px solid #0b5cad; border-left:6px solid #0b5cad; }
+  .box b { color:#b3125a; }
+  thead th { background:#eef5fd; border-top:2px solid #0b5cad; border-bottom:1px solid #0b5cad; }
+  tbody tr:last-child td { border-bottom:2px solid #0b5cad; }
+  tbody td:first-child { font-weight:bold; color:#0b5cad; }
+  li::marker { color:#0b5cad; font-weight:bold; }
+  .title hr { border-top:3px solid #0b5cad; }
+  #bar { background:#0b5cad; }
+  .foot { border-top:1px solid #0b5cad; }
+  .tf { color:#d35400; font-weight:bold; }
+  .pt { color:#7b2cbf; font-weight:bold; }
+  .t-com { color:#6a737d; font-style:italic; }
+  .t-str { color:#0a7a3d; }
+  .t-kw  { color:#c2185b; font-weight:bold; }
+  .t-num { color:#b35900; }
+  .t-fn  { color:#1a56db; }
+  .t-mod { color:#0b7285; font-weight:bold; }
+  @page { size:1280px 720px; margin:0; }
+  @media print {
+    html,body { overflow:visible; height:auto; }
+    #stage { position:static; transform:none !important; width:auto; height:auto; border:0; }
+    .slide { display:block; position:relative; width:1280px; height:720px; page-break-after:always; border:0; }
+    #bar,#nav { display:none; }
+  }
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<div id="stage">
+
+<!-- 1 -->
+<section class="slide title">
+  <h1>TensorFlow/Keras et PyTorch :<br>comparaison des frameworks</h1>
+  <hr>
+  <p>Gestion des données, entraînement et déploiement des modèles</p>
+  <p class="small">Deep Learning – Présentation</p>
+</section>
+
+<!-- 2 -->
+<section class="slide">
+  <h2>Objectif et plan</h2>
+  <p><b>Objectif :</b> comparer les principaux frameworks de Deep Learning et comprendre leurs différences dans la gestion des données, l’entraînement et le déploiement des modèles.</p>
+  <ol>
+    <li>Comparaison des approches TensorFlow/Keras et PyTorch</li>
+    <li>Gestion des tenseurs et préparation des données</li>
+    <li>Gestion de l’entraînement : perte, optimiseur, métriques</li>
+    <li>Sauvegarde, chargement et réutilisation des modèles</li>
+    <li>Critères de choix d’un framework</li>
+  </ol>
+</section>
+
+<!-- 3 -->
+<section class="slide">
+  <h2>1. Origines et philosophie</h2>
+  <div class="cols">
+    <div>
+      <h3>TensorFlow / Keras</h3>
+      <ul>
+        <li>Google Brain, 2015</li>
+        <li>Pensé pour la production à grande échelle : graphes optimisés, calcul distribué</li>
+        <li>Keras : API de haut niveau, intégrée depuis TF 2.0</li>
+        <li>Keras 3 : multi-backend (TensorFlow, JAX, PyTorch)</li>
+      </ul>
+    </div>
+    <div>
+      <h3>PyTorch</h3>
+      <ul>
+        <li>Facebook AI Research, 2016 (héritier de Torch)</li>
+        <li>Philosophie « Pythonic » : un modèle est une classe Python</li>
+        <li>Exécution ligne par ligne, débogage avec <code>print</code> et <code>pdb</code></li>
+        <li>Standard de la recherche académique</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 4 -->
+<section class="slide">
+  <h2>1. Graphe de calcul et style de programmation</h2>
+  <ul>
+    <li><b>TensorFlow 1.x</b> : graphe statique construit avant exécution, optimisé mais difficile à déboguer.</li>
+    <li><b>TensorFlow 2</b> : <em>eager execution</em> par défaut ; compilation en graphe avec <code>@tf.function</code>.</li>
+    <li><b>PyTorch</b> : graphe dynamique (<em>define-by-run</em>) recréé à chaque passe avant ; boucles et conditions Python autorisées. <code>torch.compile</code> (PyTorch 2) pour accélérer.</li>
+    <li><b>Keras</b> : style déclaratif — <code>compile()</code> puis <code>fit()</code>.</li>
+    <li><b>PyTorch</b> : style impératif — boucle d’entraînement écrite par l’utilisateur.</li>
+  </ul>
+  <div class="box">Keras : simplicité et rapidité. PyTorch : contrôle total et flexibilité.</div>
+</section>
+
+<!-- 5 -->
+<section class="slide">
+  <h2>1. Synthèse comparative</h2>
+  <table>
+    <thead><tr><th>Critère</th><th>TensorFlow / Keras</th><th>PyTorch</th></tr></thead>
+    <tbody>
+      <tr><td>Développeur</td><td>Google</td><td>Meta / PyTorch Foundation</td></tr>
+      <tr><td>Style</td><td>Haut niveau, déclaratif</td><td>Bas niveau, impératif</td></tr>
+      <tr><td>Graphe</td><td>Eager + <code>tf.function</code></td><td>Dynamique, <code>torch.compile</code></td></tr>
+      <tr><td>Débogage</td><td>Plus délicat en mode graphe</td><td>Natif Python</td></tr>
+      <tr><td>Apprentissage</td><td>Très doux avec Keras</td><td>Doux, plus de code</td></tr>
+      <tr><td>Usage dominant</td><td>Production, mobile, web</td><td>Recherche, prototypage</td></tr>
+      <tr><td>Outils</td><td>TensorBoard, TFX, TF Serving, TF Lite, TF.js</td><td>TorchServe, TorchVision, Lightning, Hugging Face</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 6 -->
+<section class="slide">
+  <h2>1. Même modèle, deux écritures</h2>
+  <div class="cols">
+    <div>
+<pre><code># Keras
+import tensorflow as tf
+model = tf.keras.Sequential([
+  tf.keras.layers.Dense(64,
+      activation="relu",
+      input_shape=(20,)),
+  tf.keras.layers.Dense(1,
+      activation="sigmoid")
+])</code></pre>
+      <p class="cap">Déclaratif : on empile des couches.</p>
+    </div>
+    <div>
+<pre><code># PyTorch
+import torch, torch.nn as nn
+class Net(nn.Module):
+  def __init__(self):
+    super().__init__()
+    self.fc1 = nn.Linear(20, 64)
+    self.fc2 = nn.Linear(64, 1)
+  def forward(self, x):
+    x = torch.relu(self.fc1(x))
+    return torch.sigmoid(self.fc2(x))
+model = Net()</code></pre>
+      <p class="cap">Impératif : on écrit le <code>forward</code>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 7 -->
+<section class="slide">
+  <h2>2. Les tenseurs</h2>
+  <p>Tableau multidimensionnel défini par sa <em>forme</em>, son <em>type</em> (dtype) et son <em>périphérique</em> (CPU, GPU, TPU). Rang 0 : scalaire ; 1 : vecteur ; 2 : matrice ; 4 : lot d’images couleur.</p>
+  <ul>
+    <li><b>Mutabilité :</b> <code>tf.Tensor</code> immuable (paramètres via <code>tf.Variable</code>) ; <code>torch.Tensor</code> modifiable sur place.</li>
+    <li><b>Dérivation automatique :</b> <code>tf.GradientTape</code> contre <code>requires_grad=True</code> et <em>autograd</em>.</li>
+    <li><b>Périphérique :</b> placement automatique sur GPU (TF) contre <code>.to("cuda")</code> explicite (PyTorch).</li>
+  </ul>
+<pre><code>a = tf.constant([[1., 2.], [3., 4.]])     # TensorFlow
+b = torch.tensor([[1., 2.], [3., 4.]])    # PyTorch
+a_np, b_np = a.numpy(), b.numpy()         # conversion NumPy
+b = b.to("cuda" if torch.cuda.is_available() else "cpu")</code></pre>
+</section>
+
+<!-- 8 -->
+<section class="slide">
+  <h2>2. Pipelines de données</h2>
+  <div class="cols">
+    <div>
+      <h3>TensorFlow : <code>tf.data</code></h3>
+      <p>Pipeline déclaratif : <code>map</code>, <code>shuffle</code>, <code>batch</code>, <code>cache</code>, <code>prefetch</code>. Couches de prétraitement Keras intégrables au modèle.</p>
+<pre><code>ds = (tf.data.Dataset
+  .from_tensor_slices((X, y))
+  .shuffle(1000)
+  .batch(32)
+  .prefetch(tf.data.AUTOTUNE))</code></pre>
+    </div>
+    <div>
+      <h3>PyTorch : <code>Dataset</code> + <code>DataLoader</code></h3>
+      <p><code>__len__</code> et <code>__getitem__</code> définissent le jeu ; le <code>DataLoader</code> gère lots, mélange et chargement parallèle. <code>torchvision.transforms</code> pour l’augmentation.</p>
+<pre><code>ds = TensorDataset(
+  torch.tensor(X), torch.tensor(y))
+loader = DataLoader(ds,
+  batch_size=32, shuffle=True,
+  num_workers=2)</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- 9 -->
+<section class="slide">
+  <h2>2. Étapes de préparation des données</h2>
+  <ol>
+    <li><b>Nettoyage et séparation</b> : entraînement, validation, test, sans fuite d’information.</li>
+    <li><b>Normalisation / standardisation</b> des entrées pour stabiliser l’apprentissage.</li>
+    <li><b>Encodage</b> des variables catégorielles (one-hot, indices, embeddings).</li>
+    <li><b>Augmentation</b> (rotations, retournements, bruit) contre le surapprentissage.</li>
+    <li><b>Mise en lots</b> et chargement efficace vers le GPU.</li>
+  </ol>
+  <div class="box"><b>Attention :</b> format des images — TensorFlow : <em>channels-last</em> (N, H, L, C) ; PyTorch : <em>channels-first</em> (N, C, H, L). Source fréquente d’erreurs de forme.</div>
+</section>
+
+<!-- 10 -->
+<section class="slide">
+  <h2>3. Principe et fonction de perte</h2>
+  <p>Pour chaque lot : <b>passe avant</b> → <b>perte</b> → <b>rétropropagation</b> (gradients) → <b>mise à jour des poids</b>. Les métriques évaluent le modèle sans intervenir dans l’optimisation.</p>
+  <table>
+    <thead><tr><th>Tâche</th><th>Keras</th><th>PyTorch</th></tr></thead>
+    <tbody>
+      <tr><td>Régression</td><td><code>MeanSquaredError</code></td><td><code>nn.MSELoss</code></td></tr>
+      <tr><td>Classification binaire</td><td><code>BinaryCrossentropy</code></td><td><code>nn.BCELoss</code> / <code>BCEWithLogitsLoss</code></td></tr>
+      <tr><td>Multiclasse</td><td><code>SparseCategoricalCrossentropy</code></td><td><code>nn.CrossEntropyLoss</code></td></tr>
+    </tbody>
+  </table>
+  <p class="cap">Note : <code>CrossEntropyLoss</code> attend des logits bruts (sans softmax) et des indices de classes.</p>
+</section>
+
+<!-- 11 -->
+<section class="slide">
+  <h2>3. Optimiseur et métriques</h2>
+  <div class="cols">
+    <div>
+      <h3>Optimiseur</h3>
+      <ul>
+        <li>SGD (momentum), RMSprop, Adam, AdamW</li>
+        <li>Taux d’apprentissage : hyperparamètre le plus sensible</li>
+        <li>Schedulers : décroissance exponentielle, cosinus, réduction sur plateau</li>
+        <li>Keras : passé à <code>compile()</code></li>
+        <li>PyTorch : <code>optim.Adam(model.parameters(), lr=1e-3)</code></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Métriques</h3>
+      <ul>
+        <li>Classification : accuracy, précision, rappel, F1, AUC</li>
+        <li>Régression : MAE, RMSE</li>
+        <li>Keras : <code>metrics=[…]</code> dans <code>compile()</code></li>
+        <li>PyTorch : calcul manuel ou bibliothèque <em>TorchMetrics</em></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 12 -->
+<section class="slide">
+  <h2>3. Boucle d’entraînement comparée</h2>
+  <div class="cols">
+    <div>
+<pre><code># Keras : encapsulé
+model.compile(
+  optimizer="adam",
+  loss="binary_crossentropy",
+  metrics=["accuracy"])
+model.fit(ds, epochs=10,
+  validation_data=val_ds)</code></pre>
+      <p class="cap">Personnalisable par callbacks : <code>EarlyStopping</code>, <code>ModelCheckpoint</code>, <code>TensorBoard</code>.</p>
+    </div>
+    <div>
+<pre><code># PyTorch : explicite
+for epoch in range(10):
+  model.train()
+  for xb, yb in loader:
+    optimizer.zero_grad()
+    loss = criterion(
+      model(xb).squeeze(), yb)
+    loss.backward()
+    optimizer.step()
+  model.eval()
+  with torch.no_grad():
+    ...  # validation</code></pre>
+      <p class="cap">Contrôle total ; <em>PyTorch Lightning</em> automatise la boucle.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 13 -->
+<section class="slide">
+  <h2>3. Pièges fréquents</h2>
+  <ul>
+    <li>Oublier <code>optimizer.zero_grad()</code> en PyTorch : les gradients s’accumulent.</li>
+    <li>Oublier <code>model.eval()</code> et <code>torch.no_grad()</code> à l’évaluation : dropout et batch norm restent actifs.</li>
+    <li>Appliquer un softmax avant une perte qui l’inclut déjà (double softmax).</li>
+    <li>Ne pas comparer perte d’entraînement et de validation : le surapprentissage passe inaperçu.</li>
+    <li>Fixer des graines aléatoires pour la reproductibilité des résultats.</li>
+  </ul>
+</section>
+
+<!-- 14 -->
+<section class="slide">
+  <h2>4. Sauvegarde et chargement</h2>
+  <div class="cols">
+    <div>
+      <h3>TensorFlow / Keras</h3>
+      <p>Fichier unique : architecture, poids, configuration, état de l’optimiseur. Format <code>.keras</code> (ancien <code>.h5</code>). <b>SavedModel</b> pour le déploiement.</p>
+<pre><code>model.save("modele.keras")
+model = tf.keras.models \
+  .load_model("modele.keras")
+model.export("saved_model_dir")</code></pre>
+    </div>
+    <div>
+      <h3>PyTorch</h3>
+      <p>Pratique recommandée : sauvegarder le <code>state_dict</code>, recréer l’architecture, recharger les poids. Checkpoint complet pour reprendre l’entraînement.</p>
+<pre><code>torch.save(model.state_dict(),
+           "poids.pth")
+model = Net()
+model.load_state_dict(torch.load(
+  "poids.pth", weights_only=True))
+model.eval()</code></pre>
+    </div>
+  </div>
+  <p class="cap">Sécurité : <code>torch.load</code> repose sur <code>pickle</code> ; utiliser <code>weights_only=True</code> ou le format <em>safetensors</em>.</p>
+</section>
+
+<!-- 15 -->
+<section class="slide">
+  <h2>4. Réutilisation et déploiement</h2>
+  <ul>
+    <li><b>Transfer learning</b> : modèle pré-entraîné (<code>keras.applications</code>, <code>torchvision.models</code>, Hugging Face), couches de base gelées, nouvelle tête entraînée ; <em>fine-tuning</em> à faible taux d’apprentissage.</li>
+    <li><b>Interopérabilité</b> : export <b>ONNX</b> et inférence avec ONNX Runtime.</li>
+  </ul>
+  <table>
+    <thead><tr><th>Besoin</th><th>TensorFlow / Keras</th><th>PyTorch</th></tr></thead>
+    <tbody>
+      <tr><td>Poids seuls</td><td><code>save_weights</code></td><td><code>state_dict</code></td></tr>
+      <tr><td>Serveur</td><td>SavedModel + TF Serving</td><td>TorchServe, ONNX</td></tr>
+      <tr><td>Mobile / embarqué</td><td>TF Lite</td><td>ExecuTorch</td></tr>
+      <tr><td>Navigateur</td><td>TF.js</td><td>ONNX Runtime Web</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 16 -->
+<section class="slide">
+  <h2>5. Critères de choix</h2>
+  <ul>
+    <li><b>Nature du projet</b> : recherche et prototypage → PyTorch ; production, mobile, web → TensorFlow ; apprentissage et projets rapides → Keras.</li>
+    <li><b>Compétences de l’équipe</b> : expérience, documentation, communauté.</li>
+    <li><b>Écosystème</b> : Hugging Face très orienté PyTorch ; Keras 3 offre une API unique avec choix du backend.</li>
+    <li><b>Matériel et performance</b> : CUDA et entraînement distribué dans les deux ; avantage historique de TensorFlow sur TPU. Les écarts dépendent surtout du modèle et du pipeline de données.</li>
+    <li><b>Déploiement visé</b> : serveur, mobile, navigateur, embarqué.</li>
+  </ul>
+</section>
+
+<!-- 17 -->
+<section class="slide">
+  <h2>5. Grille de décision</h2>
+  <table>
+    <thead><tr><th>Situation</th><th>Choix conseillé</th></tr></thead>
+    <tbody>
+      <tr><td>Débutant, modèle rapide</td><td>Keras</td></tr>
+      <tr><td>Architecture personnalisée, expérimentation</td><td>PyTorch</td></tr>
+      <tr><td>Reproduire ou adapter un article récent</td><td>PyTorch</td></tr>
+      <tr><td>Application mobile ou navigateur</td><td>TensorFlow (Lite / JS)</td></tr>
+      <tr><td>Pipeline industriel complet (MLOps)</td><td>TensorFlow / TFX, ou PyTorch + outils tiers</td></tr>
+      <tr><td>Compatibilité entre outils</td><td>Export ONNX</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 18 -->
+<section class="slide">
+  <h2>Conclusion</h2>
+  <ul>
+    <li>Les deux frameworks ont convergé : exécution immédiate, compilation optionnelle, différentiation automatique, modèles pré-entraînés.</li>
+    <li>Différence principale : <b>simplicité</b> (Keras) contre <b>contrôle explicite</b> (PyTorch).</li>
+    <li>TensorFlow : chaîne de déploiement mature. PyTorch : domination de la recherche.</li>
+    <li>Les concepts communs (tenseurs, perte, optimiseur, métriques, sérialisation) rendent le passage de l’un à l’autre aisé.</li>
+  </ul>
+  <div class="box">Le bon choix : celui qui répond aux contraintes du projet et aux compétences de l’équipe.</div>
+</section>
+
+<div id="nav"><button id="prev" aria-label="Diapositive précédente">←</button><button id="next" aria-label="Diapositive suivante">→</button></div>
+</div>
+
+<script>
+(function(){
+  var slides=[].slice.call(document.querySelectorAll('.slide')), stage=document.getElementById('stage'),
+      bar=document.getElementById('bar'), i=0;
+  slides.forEach(function(s,k){
+    if(k>0){ var f=document.createElement('div'); f.className='foot';
+      f.innerHTML='<span>TensorFlow/Keras et PyTorch</span><span>'+(k+1)+' / '+slides.length+'</span>'; s.appendChild(f); }
+  });
+  function show(n){
+    i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach(function(s,k){ s.classList.toggle('on',k===i); });
+    bar.style.width=((i+1)/slides.length*100)+'%';
+    try{ history.replaceState(null,'','#'+(i+1)); }catch(e){}
+  }
+  function fit(){
+    var s=Math.min(innerWidth/1280,innerHeight/720)*0.98;
+    stage.style.transform='translate(-50%,-50%) scale('+s+')';
+  }
+  document.addEventListener('keydown',function(e){
+    if(['ArrowRight','PageDown',' ','Enter'].indexOf(e.key)>-1){ e.preventDefault(); show(i+1); }
+    else if(['ArrowLeft','PageUp','Backspace'].indexOf(e.key)>-1){ e.preventDefault(); show(i-1); }
+    else if(e.key==='Home') show(0);
+    else if(e.key==='End') show(slides.length-1);
+    else if(e.key==='f'||e.key==='F'){ document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen(); }
+  });
+  document.getElementById('next').onclick=function(){show(i+1)};
+  document.getElementById('prev').onclick=function(){show(i-1)};
+  var tx=null;
+  document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX});
+  document.addEventListener('touchend',function(e){ if(tx===null)return; var d=e.changedTouches[0].clientX-tx;
+    if(Math.abs(d)>50) show(d<0?i+1:i-1); tx=null; });
+  addEventListener('resize',fit); fit();
+  show((parseInt(location.hash.slice(1),10)||1)-1);
+})();
+</script>
+<script>
+(function(){
+  function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  var re=/(#[^\n]*)|("(?:[^"\\]|\\.)*")|\b(import|from|class|def|for|in|with|as|return|if|else|True|False|None)\b|\b(tf|torch|nn|keras|optim|np)\b|\b(\d+\.?\d*(?:e-?\d+)?)\b|\b([A-Za-z_]\w*)(?=\()/g;
+  document.querySelectorAll('pre code').forEach(function(c){
+    var src=c.textContent, out='', last=0, m;
+    re.lastIndex=0;
+    while((m=re.exec(src))){
+      out+=esc(src.slice(last,m.index));
+      var cls=m[1]?'t-com':m[2]?'t-str':m[3]?'t-kw':m[4]?'t-mod':m[5]?'t-num':'t-fn';
+      out+='<span class="'+cls+'">'+esc(m[0])+'</span>';
+      last=re.lastIndex;
+    }
+    c.innerHTML=out+esc(src.slice(last));
+  });
+  // Couleur des noms de frameworks dans le texte courant
+  var w=document.createTreeWalker(document.getElementById('stage'),NodeFilter.SHOW_TEXT,{
+    acceptNode:function(n){
+      if(!/TensorFlow|Keras|PyTorch/.test(n.nodeValue)) return NodeFilter.FILTER_REJECT;
+      return n.parentNode.closest('pre,code,.foot,script,.title h1')?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT;
+    }}), nodes=[], n;
+  while((n=w.nextNode())) nodes.push(n);
+  nodes.forEach(function(t){
+    var span=document.createElement('span');
+    span.innerHTML=esc(t.nodeValue).replace(/(TensorFlow|Keras)/g,'<span class="tf">$1</span>').replace(/(PyTorch)/g,'<span class="pt">$1</span>');
+    t.parentNode.replaceChild(span,t);
+  });
+  var h=document.querySelector('.title h1');
+  if(h) h.innerHTML='<span class="tf">TensorFlow/Keras</span> et <span class="pt">PyTorch</span> :<br>comparaison des frameworks';
+})();
+</script>
+</body>
+</html>
